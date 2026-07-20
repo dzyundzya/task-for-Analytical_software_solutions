@@ -28,8 +28,8 @@ def inspect_db_server_on_close(
 async def initialize_db_tables(connection: AsyncConnection) -> None:
     loguru.logger.info("Database Table Creation --- Initializing . . .")
 
-    await connection.run_sync(Base.metadata.drop_all)
-    await connection.run_sync(Base.metadata.create_all)
+    # await connection.run_sync(Base.metadata.drop_all)
+    # await connection.run_sync(Base.metadata.create_all)
 
     loguru.logger.info("Database Table Creation --- Successfully Initialized!")
 
