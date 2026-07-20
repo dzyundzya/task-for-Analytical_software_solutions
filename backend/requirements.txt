@@ -1,9 +1,8 @@
 alembic
 asgi_lifespan
 argon2_cffi
-asyncio
 asyncpg
-bcrypt
+bcrypt==4.3.0
 black
 colorama
 email-validator
@@ -13,8 +12,7 @@ httpx
 isort
 loguru
 mypy
-passlib
-pathlib
+passlib==1.7.4
 pre-commit
 pydantic==1.10.13
 python-dotenv
