@@ -36,3 +36,9 @@ class Document(Base):
         sqlalchemy.DateTime(timezone=True),
         onupdate=sqlalchemy_function.now(),
     )
+    is_deleted: SQLAlchemyMapped[bool] = sqlalchemy_mapped_column(
+        sqlalchemy.Boolean,
+        nullable=False,
+        default=False,
+        server_default=sqlalchemy.false(),
+    )
