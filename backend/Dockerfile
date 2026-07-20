@@ -1,5 +1,5 @@
 # Pull official latest Python Docker image (Pulished with version 3.11.0)
-FROM --platform=linux/amd64 python:latest
+FROM python:3.11-slim
 
 # Set the working directory
 WORKDIR /usr/backend
@@ -18,7 +18,7 @@ EXPOSE 8000
 
 # Install system dependencies
 RUN apt-get update \
-  && apt-get -y install netcat gcc postgresql \
+  && apt-get -y install netcat-openbsd gcc postgresql \
   && apt-get clean
 
 # Install Python dependencies

@@ -8,10 +8,13 @@ ROOT_DIR: pathlib.Path = pathlib.Path(__file__).parent.parent.parent.parent.pare
 
 
 class BackendBaseSettings(pydantic.BaseSettings):
-    TITLE: str = "DAPSQL FARN-Stack Template Application"
+    TITLE: str = "API для тестового ООО Аналитические программные решения"
     VERSION: str = "0.1.0"
     TIMEZONE: str = "UTC"
-    DESCRIPTION: str | None = None
+    DESCRIPTION: str | None = (
+        "До этого работал на джанге, там был крутой wemake-django-template, "
+        "посмотрел что существует у FastAPI по стартовый шаблонам, Django - WIN"
+    )
     DEBUG: bool = False
 
     SERVER_HOST: str = decouple.config("BACKEND_SERVER_HOST", cast=str)  # type: ignore
