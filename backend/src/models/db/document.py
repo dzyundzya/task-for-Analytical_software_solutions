@@ -34,6 +34,7 @@ class Document(Base):
     )
     updated_date: SQLAlchemyMapped[datetime] = sqlalchemy_mapped_column(
         sqlalchemy.DateTime(timezone=True),
+        nullable=True,
         onupdate=sqlalchemy_function.now(),
     )
     is_deleted: SQLAlchemyMapped[bool] = sqlalchemy_mapped_column(
