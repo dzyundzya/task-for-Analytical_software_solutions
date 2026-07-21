@@ -114,7 +114,6 @@ class DocumentSearchService:
     async def search_document_ids(
         self,
         text_query: str,
-        elastic_limit: int = 10000,
     ) -> DocumentSearchResult:
         """Ищет документы по тексту и возвращает id найденных документов."""
 
@@ -122,7 +121,7 @@ class DocumentSearchService:
 
         response = await self._client.search(
             index=self._index_name,
-            size=elastic_limit,
+            size=settings.ELASTICSEARCH_SEARCH_LIMIT,
             query={
                 "match": {
                     "text": text_query,

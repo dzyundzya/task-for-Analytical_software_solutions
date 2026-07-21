@@ -76,6 +76,7 @@ class BackendBaseSettings(pydantic.BaseSettings):
     # elastic
     ELASTICSEARCH_HOST: str = decouple.config("ELASTICSEARCH_HOST", cast=str)  # type: ignore
     ELASTICSEARCH_DOCUMENT_INDEX: str = decouple.config("ELASTICSEARCH_DOCUMENT_INDEX", cast=str)  # type: ignore
+    ELASTICSEARCH_SEARCH_LIMIT: int = decouple.config("ELASTICSEARCH_SEARCH_LIMIT", cast=int)  # type: ignore
 
     class Config(pydantic.BaseConfig):
         case_sensitive: bool = True
