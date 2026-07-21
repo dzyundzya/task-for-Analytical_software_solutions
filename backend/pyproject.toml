@@ -104,13 +104,11 @@ addopts = '''
     --strict-markers
     --tb=short
     --cov=src
-    --cov=tests
     --cov-branch
     --cov-report=term-missing
     --cov-report=html:coverage/cov.html
     --cov-report=xml:coverage/cov.xml
     --no-cov-on-fail
     --cov-fail-under=63
-    --numprocesses=auto
     --asyncio-mode=auto
 '''
