@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, File, Query, status, UploadFile, HTTPException
+from fastapi import APIRouter, Depends, File, HTTPException, Query, status, UploadFile
 
 from src.api.dependencies.repository import get_repository
 from src.models.enums.document import DocumentSort
