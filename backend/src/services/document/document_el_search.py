@@ -3,11 +3,10 @@ from typing import Sequence, cast, Any
 
 import loguru
 from elasticsearch import AsyncElasticsearch, NotFoundError
-from elasticsearch._async.helpers import async_bulk
+from elasticsearch.helpers import async_bulk
 
 from src.config.manager import settings
 from src.models.db.document import Document
-from src.models.schemas.document import DocumentInCreate
 
 
 @dataclass
@@ -24,6 +23,16 @@ class DocumentSearchService:
     def __init__(self) -> None:
         self._client = AsyncElasticsearch(hosts=[settings.ELASTICSEARCH_HOST])
         self._index_name = settings.ELASTICSEARCH_DOCUMENT_INDEX
+
+    async def __aenter__(self) -> "DocumentSearchService":
+        """Открывает контекстный менеджер."""
+
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
+        """Закрывает контекстный менеджер."""
+
+        await self.close()
 
     async def close(self) -> None:
         """Закрывает соединение с Elasticsearch."""
