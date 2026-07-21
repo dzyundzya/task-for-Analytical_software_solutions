@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends, UploadFile, File, status
+from fastapi import APIRouter, Depends, UploadFile, File, Query, status
 
 from src.api.dependencies.repository import get_repository
-from src.models.schemas.document import DocumentInResponse, DocumentInCreate
+from src.models.enums.document import DocumentSort
+from src.models.schemas.document import DocumentInResponse, DocumentInCreate, DocumentsListResponse
 from src.repository.crud.document import DocumentCRUDRepository
 from src.services.document_csv import DocumentCSVService
 from src.utilities.exceptions.database import EntityDoesNotExist
@@ -9,6 +10,26 @@ from src.utilities.exceptions.http.exc_404 import http_404_exc_id_not_found_requ
 
 
 router = APIRouter(prefix="/documents", tags=["documents"])
+
+
+@router.post(
+    path='/import-csv',
+    status_code=status.HTTP_201_CREATED,
+)
+async def import_documents_from_csv(
+    csv_file: UploadFile = File(...),
+    document_repo: DocumentCRUDRepository = Depends(
+        get_repository(repo_type=DocumentCRUDRepository),
+    )
+) -> dict[str, int]:
+    """Импортирует документы из CSV."""
+
+    csv_service = DocumentCSVService(document_repo=document_repo)
+    imported_count = await csv_service.import_documents_from_csv(
+        csv_file=csv_file,
+    )
+
+    return {"imported_count": imported_count}
 
 
 @router.post(
@@ -33,36 +54,68 @@ async def create_document(
 
 @router.get(
     path="",
-    response_model=list[DocumentInResponse],
+    response_model=DocumentsListResponse,
     status_code=status.HTTP_200_OK,
 )
 async def get_documents(
+    limit:  int = Query(default=20, ge=1, le=50),
+    offset: int = Query(default=0, ge=0),
+    sort: DocumentSort = Query(default=DocumentSort.CREATED_DATE_DESC),
     document_repo: DocumentCRUDRepository = Depends(
         get_repository(repo_type=DocumentCRUDRepository),
     )
-) -> list[DocumentInResponse]:
+) -> DocumentsListResponse:
     """Возвращает неудаленные документы."""
 
-    documents = await document_repo.read_documents()
+    documents = await document_repo.read_documents(
+        limit=limit,
+        offset=offset,
+        sort=sort,
+    )
+    total = await document_repo.count_documents(is_deleted=False)
 
-    return [DocumentInResponse.from_orm(document) for document in documents]
+    items = [DocumentInResponse.from_orm(document) for document in documents]
+
+    return DocumentsListResponse(
+        items=items,
+        limit=limit,
+        offset=offset,
+        count=len(items),
+        total=total,
+    )
 
 
 @router.get(
     path='/deleted',
-    response_model=list[DocumentInResponse],
+    response_model=DocumentsListResponse,
     status_code=status.HTTP_200_OK,
 )
 async def get_deleted_documents(
+    limit:  int = Query(default=20, ge=1, le=50),
+    offset: int = Query(default=0, ge=0),
+    sort: DocumentSort = Query(default=DocumentSort.UPDATED_DATE_DESC),
     document_repo: DocumentCRUDRepository = Depends(
         get_repository(repo_type=DocumentCRUDRepository),
     )
-) -> list[DocumentInResponse]:
+) -> DocumentsListResponse:
     """Возвращает is_deleted документы."""
 
-    documents = await document_repo.read_deleted_documents()
+    documents = await document_repo.read_deleted_documents(
+        limit=limit,
+        offset=offset,
+        sort=sort,
+    )
+    total = await document_repo.count_documents(is_deleted=True)
 
-    return [DocumentInResponse.from_orm(document) for document in documents]
+    items = [DocumentInResponse.from_orm(document) for document in documents]
+
+    return DocumentsListResponse(
+        items=items,
+        limit=limit,
+        offset=offset,
+        count=len(items),
+        total=total,
+    )
 
 
 @router.get(
@@ -136,23 +189,3 @@ async def hard_delete_document(
         )
 
     return {"notification": result}
-
-
-@router.post(
-    path='/import-csv',
-    status_code=status.HTTP_201_CREATED,
-)
-async def import_documents_from_csv(
-    csv_file: UploadFile = File(...),
-    document_repo: DocumentCRUDRepository = Depends(
-        get_repository(repo_type=DocumentCRUDRepository),
-    )
-) -> dict[str, int]:
-    """Импортирует документы из CSV."""
-
-    csv_service = DocumentCSVService(document_repo=document_repo)
-    imported_count = await csv_service.import_documents_from_csv(
-        csv_file=csv_file,
-    )
-
-    return {"notification": imported_count}

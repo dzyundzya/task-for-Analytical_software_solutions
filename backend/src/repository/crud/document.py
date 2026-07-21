@@ -4,42 +4,85 @@ import loguru
 import sqlalchemy
 from sqlalchemy.sql import functions as sqlalchemy_functions
 
+from src.models.enums.document import DocumentSort
 from src.models.db.document import Document
 from src.models.schemas.document import DocumentInCreate
 from src.repository.crud.base import BaseCRUDRepository
 from src.utilities.exceptions.database import EntityDoesNotExist
 
 
+_DOCUMENT_SORT_COLUMNS = {
+    DocumentSort.CREATED_DATE_DESC: Document.created_date.desc(),
+    DocumentSort.CREATED_DATE_ASC: Document.created_date.asc(),
+    DocumentSort.UPDATED_DATE_DESC: Document.updated_date.desc(),
+    DocumentSort.UPDATED_DATE_ASC: Document.updated_date.asc(),
+}
+
+
 class DocumentCRUDRepository(BaseCRUDRepository):
     """Репозиторий для работы с документами."""
+
+    async def count_documents(self, is_deleted: bool = False) -> int:
+        """Возвращает количество документов."""
+
+        documents_count_stmt = (
+            sqlalchemy.select(sqlalchemy.func.count())
+            .select_from(Document)
+            .where(Document.is_deleted.is_(is_deleted))
+        )
+
+        query = await self.async_session.execute(statement=documents_count_stmt)
+        return int(query.scalar_one())
 
     async def create_document(self, document_create: DocumentInCreate) -> Document:
         """Создает документ в бд."""
 
         document = Document(**document_create.dict())
 
-        self.async_session.add(instance=document)
-        await self.async_session.commit()
-        await self.async_session.refresh(instance=document)
+        try:
+            self.async_session.add(instance=document)
+            await self.async_session.commit()
+            await self.async_session.refresh(instance=document)
+        except Exception:
+            await self.async_session.rollback()
+            raise
 
         return document
 
-    async def read_documents(self) -> Sequence[Document]:
+    async def read_documents(
+        self,
+        limit: int = 20,
+        offset: int = 0,
+        sort: DocumentSort = DocumentSort.CREATED_DATE_ASC,
+    ) -> Sequence[Document]:
         """Возвращает неудаленные документы."""
 
-        documents_stmt = sqlalchemy.select(Document).where(
-            Document.is_deleted.is_(False),
-        ).order_by(Document.created_date.desc())
+        documents_stmt = (
+            sqlalchemy.select(Document)
+            .where(Document.is_deleted.is_(False),)
+            .order_by(_DOCUMENT_SORT_COLUMNS[sort])
+            .limit(limit)
+            .offset(offset)
+        )
 
         query = await self.async_session.execute(statement=documents_stmt)
         return query.scalars().all()
 
-    async def read_deleted_documents(self) -> Sequence[Document]:
+    async def read_deleted_documents(
+        self,
+        limit: int = 20,
+        offset: int = 0,
+        sort: DocumentSort = DocumentSort.UPDATED_DATE_DESC,
+    ) -> Sequence[Document]:
         """Возвращает софт-удаленные документы."""
 
-        documents_stmt = sqlalchemy.select(Document).where(
-            Document.is_deleted.is_(True),
-        ).order_by(Document.updated_date.desc())
+        documents_stmt = (
+            sqlalchemy.select(Document)
+            .where(Document.is_deleted.is_(True),)
+            .order_by(_DOCUMENT_SORT_COLUMNS[sort])
+            .limit(limit)
+            .offset(offset)
+        )
 
         query = await self.async_session.execute(statement=documents_stmt)
         return query.scalars().all()
@@ -74,8 +117,12 @@ class DocumentCRUDRepository(BaseCRUDRepository):
             )
         )
 
-        await self.async_session.execute(statement=soft_delete_document_stmt)
-        await self.async_session.commit()
+        try:
+            await self.async_session.execute(statement=soft_delete_document_stmt)
+            await self.async_session.commit()
+        except Exception:
+            await self.async_session.rollback()
+            raise
 
         return f"Документ с id: {pk} удален."
 
@@ -99,8 +146,12 @@ class DocumentCRUDRepository(BaseCRUDRepository):
             Document.id == pk,
         )
 
-        await self.async_session.execute(statement=hard_delete_document_stmt)
-        await self.async_session.commit()
+        try:
+            await self.async_session.execute(statement=hard_delete_document_stmt)
+            await self.async_session.commit()
+        except Exception:
+            await self.async_session.rollback()
+            raise
 
         loguru.logger.warning(
             "HARD_DELETE_DOCUMENT | document_id={}",
@@ -117,11 +168,14 @@ class DocumentCRUDRepository(BaseCRUDRepository):
 
         if not documents_create:
             return 0
-
-        await self.async_session.execute(
-            sqlalchemy.insert(table=Document),
-            [document_create.dict() for document_create in documents_create],
-        )
-        await self.async_session.commit()
+        try:
+            await self.async_session.execute(
+                sqlalchemy.insert(table=Document),
+                [document_create.dict() for document_create in documents_create],
+            )
+            await self.async_session.commit()
+        except Exception:
+            await self.async_session.rollback()
+            raise
 
         return len(documents_create)
