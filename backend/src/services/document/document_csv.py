@@ -13,7 +13,7 @@ from src.repository.crud.document import DocumentCRUDRepository
 class DocumentCSVService:
     """Сервис интеграции документов из CSV."""
 
-    def __init__(self, document_repo: DocumentCRUDRepository):
+    def __init__(self, document_repo: DocumentCRUDRepository) -> None:
         self._document_repo = document_repo
 
     async def import_documents_from_csv(self, csv_file: UploadFile) -> int:
