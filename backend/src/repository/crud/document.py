@@ -1,5 +1,6 @@
 from typing import Sequence, cast
 
+import loguru
 import sqlalchemy
 from sqlalchemy.sql import functions as sqlalchemy_functions
 
@@ -100,5 +101,10 @@ class DocumentCRUDRepository(BaseCRUDRepository):
 
         await self.async_session.execute(statement=hard_delete_document_stmt)
         await self.async_session.commit()
+
+        loguru.logger.warning(
+            "HARD_DELETE_DOCUMENT | document_id={}",
+            pk,
+        )
 
         return f"Документ с id: {pk} полностью удален из базы."
