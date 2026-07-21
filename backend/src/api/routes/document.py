@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends, UploadFile, File, Query, status
+from fastapi import APIRouter, Depends, File, Query, status, UploadFile
 
 from src.api.dependencies.repository import get_repository
 from src.models.enums.document import DocumentSort
-from src.models.schemas.document import DocumentInResponse, DocumentInCreate, DocumentsListResponse
+from src.models.schemas.document import DocumentInCreate, DocumentInResponse, DocumentsListResponse
 from src.repository.crud.document import DocumentCRUDRepository
 from src.services.document.document_csv import DocumentCSVService
 from src.services.document.document_el_search import DocumentSearchService

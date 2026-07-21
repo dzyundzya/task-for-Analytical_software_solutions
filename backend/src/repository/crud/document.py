@@ -1,11 +1,11 @@
-from typing import Sequence, cast
+from typing import cast, Sequence
 
 import loguru
 import sqlalchemy
 from sqlalchemy.sql import functions as sqlalchemy_functions
 
-from src.models.enums.document import DocumentSort
 from src.models.db.document import Document
+from src.models.enums.document import DocumentSort
 from src.models.schemas.document import DocumentInCreate
 from src.repository.crud.base import BaseCRUDRepository
 from src.utilities.exceptions.database import EntityDoesNotExist

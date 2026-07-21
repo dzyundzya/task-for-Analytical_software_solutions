@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Sequence, cast, Any
+from typing import Any, cast, Sequence
 
 import loguru
 from elasticsearch import AsyncElasticsearch, NotFoundError
