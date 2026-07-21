@@ -26,3 +26,4 @@ pytest-xdist
 SQLAlchemy==2.0.0b3
 trio
 uvicorn
+python-multipart==0.0.9
