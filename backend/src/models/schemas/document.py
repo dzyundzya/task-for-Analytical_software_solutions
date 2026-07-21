@@ -12,7 +12,7 @@ class DocumentInCreate(BaseSchemaModel):
 
 
 class DocumentInResponse(BaseSchemaModel):
-    """ Схема ответа с данными документа."""
+    """Схема ответа с данными документа."""
 
     id: int
     rubrics: list[str]

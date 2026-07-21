@@ -21,6 +21,9 @@ class DocumentCSVService:
 
         loguru.logger.info("CSV_IMPORT_START | filename={}", csv_file.filename)
 
+        if not csv_file.filename or not csv_file.filename.endswith(".csv"):
+            raise ValueError("Загруженный файл должен быть CSV.")
+
         content = await csv_file.read()
         text_stream = io.StringIO(content.decode("utf-8"))
         reader = csv.DictReader(text_stream)

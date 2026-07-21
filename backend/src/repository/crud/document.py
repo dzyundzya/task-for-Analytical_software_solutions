@@ -53,7 +53,7 @@ class DocumentCRUDRepository(BaseCRUDRepository):
         self,
         limit: int = 20,
         offset: int = 0,
-        sort: DocumentSort = DocumentSort.CREATED_DATE_ASC,
+        sort: DocumentSort = DocumentSort.CREATED_DATE_DESC,
     ) -> Sequence[Document]:
         """Возвращает неудаленные документы."""
 

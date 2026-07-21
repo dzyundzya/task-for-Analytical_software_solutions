@@ -58,7 +58,7 @@ async def create_document(
     status_code=status.HTTP_200_OK,
 )
 async def get_documents(
-    limit:  int = Query(default=20, ge=1, le=50),
+    limit: int = Query(default=20, ge=1, le=50),
     offset: int = Query(default=0, ge=0),
     sort: DocumentSort = Query(default=DocumentSort.CREATED_DATE_DESC),
     document_repo: DocumentCRUDRepository = Depends(
