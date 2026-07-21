@@ -29,8 +29,18 @@ async def import_documents_from_csv(
     imported_count = await csv_service.import_documents_from_csv(
         csv_file=csv_file,
     )
+    total = await document_repo.count_documents(is_deleted=False)
+    documents = await document_repo.read_documents(limit=total)
 
-    return {"imported_count": imported_count}
+    async with DocumentSearchService() as search_service:
+        indexed_count = await search_service.bulk_index_documents(
+            documents=documents,
+        )
+
+    return {
+        "imported_count": imported_count,
+        "indexed_count": indexed_count,
+    }
 
 
 @router.post(
