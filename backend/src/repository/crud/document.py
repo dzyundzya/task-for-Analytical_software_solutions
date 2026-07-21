@@ -55,7 +55,7 @@ class DocumentCRUDRepository(BaseCRUDRepository):
         document = query.scalar_one_or_none()
 
         if document is None:
-            raise EntityDoesNotExist(f'Документ с таким id: {pk} не существует.')
+            raise EntityDoesNotExist(f"Документ с таким id: {pk} не существует.")
 
         return cast(Document, document)
 
