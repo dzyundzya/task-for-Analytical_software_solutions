@@ -73,6 +73,10 @@ class BackendBaseSettings(pydantic.BaseSettings):
     HASHING_SALT: str = decouple.config("HASHING_SALT", cast=str)  # type: ignore
     JWT_ALGORITHM: str = decouple.config("JWT_ALGORITHM", cast=str)  # type: ignore
 
+    # elastic
+    ELASTICSEARCH_HOST: str = decouple.config("ELASTICSEARCH_HOST", cast=str)  # type: ignore
+    ELASTICSEARCH_DOCUMENT_INDEX: str = decouple.config("ELASTICSEARCH_DOCUMENT_INDEX", cast=str)  # type: ignore
+
     class Config(pydantic.BaseConfig):
         case_sensitive: bool = True
         env_file: str = f"{str(ROOT_DIR)}/.env"
