@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, UploadFile, File, status
 
 from src.api.dependencies.repository import get_repository
 from src.models.schemas.document import DocumentInResponse, DocumentInCreate
 from src.repository.crud.document import DocumentCRUDRepository
+from src.services.document_csv import DocumentCSVService
 from src.utilities.exceptions.database import EntityDoesNotExist
 from src.utilities.exceptions.http.exc_404 import http_404_exc_id_not_found_request
 
@@ -137,3 +138,21 @@ async def hard_delete_document(
     return {"notification": result}
 
 
+@router.post(
+    path='/import-csv',
+    status_code=status.HTTP_201_CREATED,
+)
+async def import_documents_from_csv(
+    csv_file: UploadFile = File(...),
+    document_repo: DocumentCRUDRepository = Depends(
+        get_repository(repo_type=DocumentCRUDRepository),
+    )
+) -> dict[str, int]:
+    """Импортирует документы из CSV."""
+
+    csv_service = DocumentCSVService(document_repo=document_repo)
+    imported_count = await csv_service.import_documents_from_csv(
+        csv_file=csv_file,
+    )
+
+    return {"notification": imported_count}
