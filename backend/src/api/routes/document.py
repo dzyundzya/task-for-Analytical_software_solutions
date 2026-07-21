@@ -81,6 +81,11 @@ async def create_document(
         document_create=document_create,
     )
 
+    # TODO: если бы не тестовое, вынес бы в scheduler
+    # TODO: и тд. и тп.
+    async with DocumentSearchService() as search_service:
+        await search_service.bulk_index_documents(documents=[document])
+
     return DocumentInResponse.from_orm(document)
 
 
