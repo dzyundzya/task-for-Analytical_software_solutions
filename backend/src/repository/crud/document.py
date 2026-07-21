@@ -179,3 +179,30 @@ class DocumentCRUDRepository(BaseCRUDRepository):
             raise
 
         return len(documents_create)
+
+    async def read_documents_by_ids(
+        self,
+        document_ids: Sequence[int],
+        limit: int = 20,
+        offset: int = 0,
+    ) -> Sequence[Document]:
+        """Возвращает неудаленные документы из list[id]."""
+
+        if not document_ids:
+            return []
+
+        documents_stmt = (
+            sqlalchemy.select(Document)
+            .where(
+                Document.id.in_(document_ids),
+                Document.is_deleted.is_(False),
+            )
+            .order_by(Document.created_date.desc())
+            .limit(limit)
+            .offset(offset)
+        )
+
+        query = await self.async_session.execute(statement=documents_stmt)
+
+        return query.scalars().all()
+
