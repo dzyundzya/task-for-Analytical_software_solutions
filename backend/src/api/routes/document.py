@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, File, Query, status, UploadFile
+from fastapi import APIRouter, Depends, File, Query, status, UploadFile, HTTPException
 
 from src.api.dependencies.repository import get_repository
 from src.models.enums.document import DocumentSort
@@ -25,8 +25,14 @@ async def import_documents_from_csv(
     """Импортирует документы из CSV."""
 
     csv_service = DocumentCSVService(document_repo=document_repo)
-    imported_count = await csv_service.import_documents_from_csv(
-        csv_file=csv_file,
+    try:
+        imported_count = await csv_service.import_documents_from_csv(
+            csv_file=csv_file,
+        )
+    except ValueError as err:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(err)
     )
     total = await document_repo.count_documents(is_deleted=False)
     documents = await document_repo.read_documents(limit=total)
