@@ -30,10 +30,7 @@ async def import_documents_from_csv(
             csv_file=csv_file,
         )
     except ValueError as err:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(err)
-    )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(err))
     total = await document_repo.count_documents(is_deleted=False)
     documents = await document_repo.read_documents(limit=total)
 
