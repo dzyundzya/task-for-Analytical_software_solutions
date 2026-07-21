@@ -20,3 +20,13 @@ class DocumentInResponse(BaseSchemaModel):
     created_date: datetime
     updated_date: datetime | None
     is_deleted: bool
+
+
+class DocumentsListResponse(BaseSchemaModel):
+    """Схема ответа списка документов с query."""
+
+    items: list[DocumentInResponse]
+    limit: int
+    offset: int
+    count: int
+    total: int
