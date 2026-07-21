@@ -25,8 +25,8 @@ class DocumentInResponse(BaseSchemaModel):
 class DocumentsListResponse(BaseSchemaModel):
     """Схема ответа списка документов с query."""
 
-    items: list[DocumentInResponse]
     limit: int
     offset: int
     count: int
     total: int
+    items: list[DocumentInResponse]
