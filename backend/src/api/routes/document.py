@@ -9,19 +9,18 @@ from src.services.document.document_el_search import DocumentSearchService
 from src.utilities.exceptions.database import EntityDoesNotExist
 from src.utilities.exceptions.http.exc_404 import http_404_exc_id_not_found_request
 
-
 router = APIRouter(prefix="/documents", tags=["documents"])
 
 
 @router.post(
-    path='/import-csv',
+    path="/import-csv",
     status_code=status.HTTP_201_CREATED,
 )
 async def import_documents_from_csv(
     csv_file: UploadFile = File(...),
     document_repo: DocumentCRUDRepository = Depends(
         get_repository(repo_type=DocumentCRUDRepository),
-    )
+    ),
 ) -> dict[str, int]:
     """Импортирует документы из CSV."""
 
@@ -72,9 +71,9 @@ async def reindex_documents(
 )
 async def create_document(
     document_create: DocumentInCreate,
-    document_repo: DocumentCRUDRepository  = Depends(
+    document_repo: DocumentCRUDRepository = Depends(
         get_repository(repo_type=DocumentCRUDRepository),
-    )
+    ),
 ) -> DocumentInResponse:
     """Создает документ."""
 
@@ -96,7 +95,7 @@ async def get_documents(
     sort: DocumentSort = Query(default=DocumentSort.CREATED_DATE_DESC),
     document_repo: DocumentCRUDRepository = Depends(
         get_repository(repo_type=DocumentCRUDRepository),
-    )
+    ),
 ) -> DocumentsListResponse:
     """Возвращает неудаленные документы."""
 
@@ -129,7 +128,7 @@ async def search_documents(
     offset: int = Query(default=0, ge=0),
     document_repo: DocumentCRUDRepository = Depends(
         get_repository(repo_type=DocumentCRUDRepository),
-    )
+    ),
 ) -> DocumentsListResponse:
     """Ищет документы по тексту с помощью Elasticsearch."""
 
@@ -155,17 +154,17 @@ async def search_documents(
 
 
 @router.get(
-    path='/deleted',
+    path="/deleted",
     response_model=DocumentsListResponse,
     status_code=status.HTTP_200_OK,
 )
 async def get_deleted_documents(
-    limit:  int = Query(default=20, ge=1, le=50),
+    limit: int = Query(default=20, ge=1, le=50),
     offset: int = Query(default=0, ge=0),
     sort: DocumentSort = Query(default=DocumentSort.UPDATED_DATE_DESC),
     document_repo: DocumentCRUDRepository = Depends(
         get_repository(repo_type=DocumentCRUDRepository),
-    )
+    ),
 ) -> DocumentsListResponse:
     """Возвращает is_deleted документы."""
 
@@ -188,7 +187,7 @@ async def get_deleted_documents(
 
 
 @router.get(
-    path='/{document_id}',
+    path="/{document_id}",
     response_model=DocumentInResponse,
     status_code=status.HTTP_200_OK,
 )
@@ -196,7 +195,7 @@ async def get_document(
     document_id: int,
     document_repo: DocumentCRUDRepository = Depends(
         get_repository(repo_type=DocumentCRUDRepository),
-    )
+    ),
 ) -> DocumentInResponse:
     """Возвращает неудаленный документ по pk."""
 
@@ -213,7 +212,7 @@ async def get_document(
 
 
 @router.delete(
-    path='/{document_id}',
+    path="/{document_id}",
     status_code=status.HTTP_200_OK,
 )
 async def soft_delete_document(
@@ -244,14 +243,14 @@ async def soft_delete_document(
 
 
 @router.delete(
-    path='/{document_id}/hard',
+    path="/{document_id}/hard",
     status_code=status.HTTP_200_OK,
 )
 async def hard_delete_document(
     document_id: int,
     document_repo: DocumentCRUDRepository = Depends(
         get_repository(repo_type=DocumentCRUDRepository),
-    )
+    ),
 ) -> dict[str, str]:
     """Полное удаление из БД."""
 

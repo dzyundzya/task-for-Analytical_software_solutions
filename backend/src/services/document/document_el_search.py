@@ -42,9 +42,7 @@ class DocumentSearchService:
     async def create_index_if_not_exists(self) -> None:
         """Создает индекс документа, если он еще не существует."""
 
-        is_index_exists = await self._client.indices.exists(
-            index=self._index_name
-        )
+        is_index_exists = await self._client.indices.exists(index=self._index_name)
 
         if is_index_exists:
             return
@@ -77,7 +75,7 @@ class DocumentSearchService:
                 "_source": {
                     "id": document.id,
                     "text": document.text,
-                }
+                },
             }
             for document in documents
         ]

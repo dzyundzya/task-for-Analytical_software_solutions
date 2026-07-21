@@ -1,7 +1,7 @@
 [project]
-name = "DAPSQL QWIK-Stack Application"
+name = "document-search-api"
 version = "0.0.1"
-description = "A comprehensive template to start a real-world quality project."
+description = "FastAPI service for document search with PostgreSQL and Elasticsearch."
 authors = [
     {name = "Aeternalis-Ingenium", email="aeternalisingenium@proton.me"},
 ]
@@ -24,6 +24,7 @@ repository = "https://github.com/Aeternalis-Ingenium/DAPSQL-FAQ-Stack-Template"
 
 [tool.black]
 color=true
+target-version = ["py311"]
 exclude = '''
     /(
         \.git

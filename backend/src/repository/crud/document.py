@@ -10,7 +10,6 @@ from src.models.schemas.document import DocumentInCreate
 from src.repository.crud.base import BaseCRUDRepository
 from src.utilities.exceptions.database import EntityDoesNotExist
 
-
 _DOCUMENT_SORT_COLUMNS = {
     DocumentSort.CREATED_DATE_DESC: Document.created_date.desc(),
     DocumentSort.CREATED_DATE_ASC: Document.created_date.asc(),
@@ -26,9 +25,7 @@ class DocumentCRUDRepository(BaseCRUDRepository):
         """Возвращает количество документов."""
 
         documents_count_stmt = (
-            sqlalchemy.select(sqlalchemy.func.count())
-            .select_from(Document)
-            .where(Document.is_deleted.is_(is_deleted))
+            sqlalchemy.select(sqlalchemy.func.count()).select_from(Document).where(Document.is_deleted.is_(is_deleted))
         )
 
         query = await self.async_session.execute(statement=documents_count_stmt)
@@ -59,7 +56,9 @@ class DocumentCRUDRepository(BaseCRUDRepository):
 
         documents_stmt = (
             sqlalchemy.select(Document)
-            .where(Document.is_deleted.is_(False),)
+            .where(
+                Document.is_deleted.is_(False),
+            )
             .order_by(_DOCUMENT_SORT_COLUMNS[sort])
             .limit(limit)
             .offset(offset)
@@ -78,7 +77,9 @@ class DocumentCRUDRepository(BaseCRUDRepository):
 
         documents_stmt = (
             sqlalchemy.select(Document)
-            .where(Document.is_deleted.is_(True),)
+            .where(
+                Document.is_deleted.is_(True),
+            )
             .order_by(_DOCUMENT_SORT_COLUMNS[sort])
             .limit(limit)
             .offset(offset)
@@ -138,9 +139,7 @@ class DocumentCRUDRepository(BaseCRUDRepository):
         document = query.scalar_one_or_none()
 
         if document is None:
-            raise EntityDoesNotExist(
-                f"Документ с id: {pk} не существует или еще не удален."
-            )
+            raise EntityDoesNotExist(f"Документ с id: {pk} не существует или еще не удален.")
 
         hard_delete_document_stmt = sqlalchemy.delete(table=Document).where(
             Document.id == pk,
@@ -205,4 +204,3 @@ class DocumentCRUDRepository(BaseCRUDRepository):
         query = await self.async_session.execute(statement=documents_stmt)
 
         return query.scalars().all()
-
