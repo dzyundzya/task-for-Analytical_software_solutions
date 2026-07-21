@@ -108,3 +108,20 @@ class DocumentCRUDRepository(BaseCRUDRepository):
         )
 
         return f"Документ с id: {pk} полностью удален из базы."
+
+    async def bulk_create_documents_form_scv(
+        self,
+        documents_create: Sequence[DocumentInCreate],
+    ) -> int:
+        """Массовое создание документов для интеграции из CSV."""
+
+        if not documents_create:
+            return 0
+
+        await self.async_session.execute(
+            sqlalchemy.insert(table=Document),
+            [document_create.dict() for document_create in documents_create],
+        )
+        await self.async_session.commit()
+
+        return len(documents_create)
